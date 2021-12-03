@@ -172,7 +172,8 @@ export default {
             SSS:values[6],
             D: values[2],
             MMMM: month_names[lang][+values[1]],
-            MMM: month_names[lang][+values[1]]
+            MMM: month_names[lang][+values[1]],
+            WW: values[7]
         };
 
         let str = format_string;
@@ -286,7 +287,8 @@ export default {
             date.getHours(),
             date.getMinutes(),
             date.getSeconds(),
-            date.getMilliseconds()
+            date.getMilliseconds(),
+            getWeekNumber(date)
         ];
     },
 
@@ -307,6 +309,24 @@ export default {
         return 28;
     }
 };
+
+function getWeekNumber(d) {
+    if(d.getDay()==1){
+        // Copy date so don't modify original
+        d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+        // Set to nearest Thursday: current date + 4 - current day number
+        // Make Sunday's day number 7
+        d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay()||7));
+        // Get first day of year
+        var yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
+        // Calculate full weeks to nearest Thursday
+        var weekNo = Math.ceil(( ( (d - yearStart) / 86400000) + 1)/7);
+        // Return array of year and week number only if monday
+        return weekNo;
+    }else{
+        return '-1';
+    }
+}
 
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/padStart
 function padStart(str, targetLength, padString) {
